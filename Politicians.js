@@ -1,5 +1,7 @@
 // ======================================================
 // PWANI WATCH — POLITICIANS
+// ======================================================
+// PWANI WATCH — POLITICIANS
 // Load politicians from Firebase Firestore
 // ======================================================
 
@@ -19,13 +21,13 @@ import {
 // ======================================================
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCyR7feKg_SAVo1o8ZWFlWphvd5RQ7a-eU",
-    authDomain: "pwani-match.firebaseapp.com",
-    projectId: "pwani-match",
-    storageBucket: "pwani-match.firebasestorage.app",
-    messagingSenderId: "221245848970",
-    appId: "1:221245848970:web:27b10109ab1030c7715c73",
-    measurementId: "G-R59LBQZYD2"
+    apiKey: "AIzaSyCyHesLeoPmY24xZjHdrrU5GS7qiKqjjCs",
+    authDomain: "pwani-watch.firebaseapp.com",
+    projectId: "pwani-watch",
+    storageBucket: "pwani-watch.firebasestorage.app",
+    messagingSenderId: "523614372985",
+    appId: "1:523614372985:web:cd4265e914f4a1303480a8",
+    measurementId: "G-962QESHXP6"
 };
 
 
@@ -51,81 +53,70 @@ const politiciansGrid = document.getElementById("politiciansGrid");
 async function loadPoliticians() {
 
     if (!politiciansGrid) {
-        console.error("politiciansGrid not found.");
+        console.error("politiciansGrid not found");
         return;
     }
 
     politiciansGrid.innerHTML = `
-        <div class="loading">
+        <p class="loading">
             Loading politicians...
-        </div>
+        </p>
     `;
 
     try {
 
+        const politiciansRef = collection(db, "politicians");
+
         const politiciansQuery = query(
-            collection(db, "politicians"),
-            orderBy("name", "asc")
+            politiciansRef,
+            orderBy("name")
         );
 
         const snapshot = await getDocs(politiciansQuery);
 
+        politiciansGrid.innerHTML = "";
+
         if (snapshot.empty) {
 
             politiciansGrid.innerHTML = `
-                <div class="empty-state">
-                    <h3>No politicians yet</h3>
-                    <p>Politician profiles will appear here.</p>
-                </div>
+                <p class="empty">
+                    No politicians have been added yet.
+                </p>
             `;
 
             return;
         }
 
-
-        politiciansGrid.innerHTML = "";
-
-
         snapshot.forEach((doc) => {
 
             const politician = doc.data();
 
-            const name = politician.name || "Unknown Politician";
-            const position = politician.position || "Position not available";
-            const party = politician.party || "Independent";
-            const photo = politician.photo || "https://via.placeholder.com/400x400?text=Politician";
-            const id = doc.id;
-
-
-            const card = document.createElement("div");
+            const card = document.createElement("article");
 
             card.className = "politician-card";
 
-
             card.innerHTML = `
                 <div class="politician-image">
-                    <img
-                        src="${photo}"
-                        alt="${name}"
-                        loading="lazy"
-                        onerror="this.src='https://via.placeholder.com/400x400?text=Politician'"
+                    <img 
+                        src="${politician.photo || "https://via.placeholder.com/400x400?text=No+Photo"}"
+                        alt="${politician.name || "Politician"}"
                     >
                 </div>
 
                 <div class="politician-info">
 
-                    <h3>${name}</h3>
+                    <h3>${politician.name || "Unknown"}</h3>
 
-                    <p class="politician-position">
-                        ${position}
+                    <p class="position">
+                        ${politician.position || ""}
                     </p>
 
-                    <p class="politician-party">
-                        ${party}
+                    <p class="party">
+                        ${politician.party || ""}
                     </p>
 
-                    <a
-                        href="politician.html?id=${id}"
+                    <a 
+                        href="politician.html?id=${doc.id}"
                         class="profile-btn"
                     >
                         View Profile
@@ -133,7 +124,6 @@ async function loadPoliticians() {
 
                 </div>
             `;
-
 
             politiciansGrid.appendChild(card);
 
@@ -144,10 +134,9 @@ async function loadPoliticians() {
         console.error("Error loading politicians:", error);
 
         politiciansGrid.innerHTML = `
-            <div class="error-state">
-                <h3>Unable to load politicians</h3>
-                <p>Please try again later.</p>
-            </div>
+            <p class="error">
+                Failed to load politicians. Please try again.
+            </p>
         `;
     }
 }
@@ -158,3 +147,5 @@ async function loadPoliticians() {
 // ======================================================
 
 loadPoliticians();
+
+
